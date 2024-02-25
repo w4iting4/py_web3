@@ -20,7 +20,7 @@ from web3 import eth
 # print(eth_test.eth.get_block('latest'))
 # w3 = Web3();
 # acc = w3.eth.account.create();
-# print(f'private key={w3.to_hex(acc.key)}, account={acc.address}')
+# print(f'private key={w3. (acc.key)}, account={acc.address}')
 # '''
 #  private key=0x6807f8e3b44b762dcc00562373bb921be5c1adeab0e68baac77d375c4403eb9b, account=0x99E83432EF5a04b68d39Eda395d71BE25359BD18
 # '''
