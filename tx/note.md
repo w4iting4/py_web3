@@ -132,7 +132,7 @@ assert tx["from"] == acct2.address
 最终成功代码，也就是第一段代码实际上成功的进行了交易，我们可以通过测试网浏览器来查看两个钱包的交易记录，https://sepolia.etherscan.io/  
 ![img_2.png](img_2.png)
 那么接下来我们要做的事情，就是搞明白整个交易过程中，所涉及到的那些参数，以及每个参数代表什么意思，下方第一个是api的参数，也是我们在测试链进行测试的参数。
-```json
+```python
     {
     'from': Web3.to_checksum_address(wallet_address1),
     'to': Web3.to_checksum_address(wallet_address2),
@@ -145,7 +145,7 @@ assert tx["from"] == acct2.address
     }
 ```
 下面是eth官方文档提供的交易json,你会发现没有提供`chainID`，同时eth官方Gas单价设置为`gasLimit`,那么接下来我们先解析各个参数的含义，在进行这些参数区别的探究。
-``` json
+``` python
 {
   from: "0xEA674fdDe714fd979de3EdF0F56AA9716B898ec8",
   to: "0xac03bb73b6a9e108530aff4df5077c2b3d481e5a",
@@ -174,7 +174,7 @@ assert tx["from"] == acct2.address
 最大费用（Max Fee Per Gas）：这是用户愿意为每个gas单位支付的最大总费用。它包括基础费用和优先费用。  
 
 新时代的计算规则如下：  
-**实际支付的总费用 = 基础费用 + 优先费用**  
+**实际支付的总费用 = gaslimit * (基础费用 + 优先费用)**  
 但是，实际支付的总费用不会超过最大费用（Max Fee Per Gas），如果最大费用（Max Fee Per Gas）大于基础费用加上优先费用，那么超出的部分将被退还给用户。这就意味着，即使用户设置了较高的最大费用，他们实际支付的往往只是必要的费用（基础费用加优先费用）。  
 在这里出现了一个basefee，如何获取当前链的basefee，如何确认当前链使用的是EIP-1559还是旧模式呢？  
 ##### 获取basefee
@@ -187,13 +187,24 @@ print(f'当前链上basefee的值为: {Web3.from_wei(basefee,'gwei')} gwei' )
 ```
 ##### 确认是否执行了EIP-1559
 最直接的方式是查阅链的官方文档，其次是通过最新的区块中有无basefee这个属性。如果有则证明实行了标准，如果没有就是旧模式。
+##### 如何确认当前交易的合理花费
+虽然他娘的有钱，但是肯定不能瞎消费，所以在每次交易的时候，我们可以进行人工的确认和干预，如果你着急就多给点，如果不着急就少花点。  
+之前打铭文的时候就经常打到了新的铭文还没gas值钱,最后留下来做了传家宝。还有让我记忆很深刻的brc的ethi,还好他娘的当时只换了500u,500u冲进去，gas给低了一个没打到，血亏。  
+言归正传，怎么平衡每次的交易费用呢？在小狐狸钱包我们进行交易的时候，通常会看到三个选项，初级、中级、高级。
+![img_3.png](img_3.png)
+那么我们根据涂上的金额进行换算大概就能得到当前小狐狸每个级别的费用是多少,当前的basefee是7gwei，优先的费用是1-10gwei。
+```python
+print(f'低级消费gas {Web3.from_wei(Web3.to_wei(0.00016897,'ether'),'gwei')} gwei,平均每单位gas价格为:{Web3.from_wei(Web3.to_wei(0.00016897,'ether'),'gwei')/21000}')
+print(f'中级消费gas {Web3.from_wei(Web3.to_wei(0.00023126,'ether'),'gwei')} gwei,平均每单位gas价格为:{Web3.from_wei(Web3.to_wei(0.00023126,'ether'),'gwei')/21000}')
+print(f'高级消费gas {Web3.from_wei(Web3.to_wei(0.00029355,'ether'),'gwei')} gwei,平均每单位gas价格为:{Web3.from_wei(Web3.to_wei(0.00029355,'ether'),'gwei')/21000}')
 
-
-
-
-
-
-
+低级消费gas 168970 gwei,平均每单位gas价格为:8.046190476190476190476190476
+中级消费gas 231260 gwei,平均每单位gas价格为:11.01238095238095238095238095
+高级消费gas 293550 gwei,平均每单位gas价格为:13.97857142857142857142857143
+```
+结合当时的basefee，其实我们发现最高费用略小于当前的`basefee x 2`,所以后续每次交易，不紧急的情况下我们定价最大交易fee为basefee的2倍即可。给个2/3的basefee都是财大气粗了💰  
+这样一来一次交易的json内容就基本没问题了，那么第二步和第三步实际上就是给交易签名然后发送交易了。到此为止我们至少搞明白了如何使用python发起一次链上交易，并且明白了如何计算费用。  
+但是到了主链上肯定会有所不同，所以接下来我们可以通过设置代理来尝试观察一次交易的请求内容。
 
 
 

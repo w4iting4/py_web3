@@ -31,6 +31,12 @@ print(f'测试网的gasprice: {Web3.from_wei(eth_test.eth.gas_price,'gwei')} gwe
 # assert tx["from"] == Web3.to_checksum_address(wallet_address1)
 
 # 获取当前basefee
-latest = eth_test.eth.get_block('latest')
-basefee = latest['baseFeePerGas']
-print(f'当前链上basefee的值为: {Web3.from_wei(basefee,'gwei')} gwei' )
+# latest = eth_test.eth.get_block('latest')
+# basefee = latest['baseFeePerGas']
+# print(f'当前链上basefee的值为: {Web3.from_wei(basefee,'gwei')} gwei' )
+
+# gasfee 计算
+print(f'低级消费gas {Web3.from_wei(Web3.to_wei(0.00016897,'ether'),'gwei')} gwei,平均每单位gas价格为:{Web3.from_wei(Web3.to_wei(0.00016897,'ether'),'gwei')/21000}')
+print(f'中级消费gas {Web3.from_wei(Web3.to_wei(0.00023126,'ether'),'gwei')} gwei,平均每单位gas价格为:{Web3.from_wei(Web3.to_wei(0.00023126,'ether'),'gwei')/21000}')
+print(f'高级消费gas {Web3.from_wei(Web3.to_wei(0.00029355,'ether'),'gwei')} gwei,平均每单位gas价格为:{Web3.from_wei(Web3.to_wei(0.00029355,'ether'),'gwei')/21000}')
+
