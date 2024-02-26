@@ -202,12 +202,21 @@ print(f'高级消费gas {Web3.from_wei(Web3.to_wei(0.00029355,'ether'),'gwei')} 
 中级消费gas 231260 gwei,平均每单位gas价格为:11.01238095238095238095238095
 高级消费gas 293550 gwei,平均每单位gas价格为:13.97857142857142857142857143
 ```
-结合当时的basefee，其实我们发现最高费用略小于当前的`basefee x 2`,所以后续每次交易，不紧急的情况下我们定价最大交易fee为basefee的2倍即可。给个2/3的basefee都是财大气粗了💰  
+结合当时的basefee，其实我们发现当前最高费用略小于当前的`basefee x 2`,所以后续每次交易，不紧急的情况下我们定价最大交易fee为basefee的2倍即可。给个2/3的basefee都是财大气粗了💰    
+但是这毕竟是我们估算的gas，其实etherscant提供了相关的接口供我们查询，可以参考文档: https://docs.etherscan.io/api-endpoints/gas-tracker ,注册一个免费的账号即可搞定    
+提供的api接口为：  
+https://api.etherscan.io/api?module=gastracker&action=gasoracle&apikey=YourApiKeyToken   
+![img_6.png](img_6.png)
 这样一来一次交易的json内容就基本没问题了，那么第二步和第三步实际上就是给交易签名然后发送交易了。到此为止我们至少搞明白了如何使用python发起一次链上交易，并且明白了如何计算费用。  
-但是到了主链上肯定会有所不同，所以接下来我们可以通过设置代理来尝试观察一次交易的请求内容。
-那我们明天再说
-
-
+最后一步：  
+`assert` 关键字用于断言语句。这意味着它会检查紧随其后的条件是否为真。如果条件为真，程序会继续执行；如果条件为假，则会抛出一个 `AssertionError` 异常。
+#### 通过yakit观察交易
+通过我的测试与抓包，在rpc发出去的时候完成了加密，mitm需要家在证书，我就懒得去解决了。  
+![img_4.png](img_4.png)  
+其实我们可以通过观察`signed.rawTransaction`的值来确认发送的内容
+![img_5.png](img_5.png)  
+发送交易内容如下：  
+`x02\xf8v\x83\xaa6\xa7\x01\x84;\x9a\xca\x00\x84w5\x94\x00\x83\x03\r@\x94p\xf5+\xc5\xa1\x1a\xdd\xdc\xc1\xa1I\xcb@\x96\xc1\xb4\x16\x10\xc7\xc6\x88\x01cEx]\x8a\x00\x00\x80\xc0\x80\xa0s\x9dTz\xf4\x13[\xae\xfe\x97\x05\xf3\xe2\x11\xadt;\x9f*\xa4G\xbeq\xf65i\xa4\xc5c\x87\xc5\xba\xa05\x96\xd5-\xb9n\xf3\x9bAuX\xc2\x9b@\x01\xb1\x04\x00\xc28\xdb\xd8=\x90\x9an\x93\x1bF\x86\xc16`
 
 
 

@@ -10,25 +10,26 @@ wallet_address2_pvk = '0x21e40cdcacc88dff289a1e4d635614601b724b961003729eae5bfe7
 eth_test = Web3(Web3.HTTPProvider('https://rpc.sepolia.org/'))
 print(f'测试网连接: {eth_test.is_connected()}')
 print(f'测试网的gasprice: {Web3.from_wei(eth_test.eth.gas_price,'gwei')} gwei')
-# # 1. Build a new tx
-# transaction = {
-#     'from': Web3.to_checksum_address(wallet_address1),
-#     'to': Web3.to_checksum_address(wallet_address2),
-#     'value': Web3.to_wei(0.1,'ether'),
-#     'nonce': eth_test.eth.get_transaction_count(Web3.to_checksum_address(wallet_address1)),
-#     'gas': 200000,
-#     'maxFeePerGas': 2000000000,
-#     'maxPriorityFeePerGas': 1000000000
-# #    'chainId':eth_test.eth.chain_id
-# }
-#
-# # 2. Sign tx with a private key
-# signed = eth_test.eth.account.sign_transaction(transaction, wallet_address1_pvk)
-#
-# # 3. Send the signed transaction
-# tx_hash = eth_test.eth.send_raw_transaction(signed.rawTransaction)
-# tx = eth_test.eth.get_transaction(tx_hash)
-# assert tx["from"] == Web3.to_checksum_address(wallet_address1)
+# 1. Build a new tx
+transaction = {
+    'from': Web3.to_checksum_address(wallet_address1),
+    'to': Web3.to_checksum_address(wallet_address2),
+    'value': Web3.to_wei(0.1,'ether'),
+    'nonce': eth_test.eth.get_transaction_count(Web3.to_checksum_address(wallet_address1)),
+    'gas': 200000,
+    'maxFeePerGas': 2000000000,
+    'maxPriorityFeePerGas': 1000000000,
+    'chainId':eth_test.eth.chain_id
+}
+
+# 2. Sign tx with a private key
+signed = eth_test.eth.account.sign_transaction(transaction, wallet_address1_pvk)
+
+# 3. Send the signed transaction
+print(f'signed tx is: {signed.rawTransaction}')
+tx_hash = eth_test.eth.send_raw_transaction(signed.rawTransaction)
+tx = eth_test.eth.get_transaction(tx_hash)
+assert tx["from"] == Web3.to_checksum_address(wallet_address1)
 
 # 获取当前basefee
 # latest = eth_test.eth.get_block('latest')
@@ -36,7 +37,7 @@ print(f'测试网的gasprice: {Web3.from_wei(eth_test.eth.gas_price,'gwei')} gwe
 # print(f'当前链上basefee的值为: {Web3.from_wei(basefee,'gwei')} gwei' )
 
 # gasfee 计算
-print(f'低级消费gas {Web3.from_wei(Web3.to_wei(0.00016897,'ether'),'gwei')} gwei,平均每单位gas价格为:{Web3.from_wei(Web3.to_wei(0.00016897,'ether'),'gwei')/21000}')
-print(f'中级消费gas {Web3.from_wei(Web3.to_wei(0.00023126,'ether'),'gwei')} gwei,平均每单位gas价格为:{Web3.from_wei(Web3.to_wei(0.00023126,'ether'),'gwei')/21000}')
-print(f'高级消费gas {Web3.from_wei(Web3.to_wei(0.00029355,'ether'),'gwei')} gwei,平均每单位gas价格为:{Web3.from_wei(Web3.to_wei(0.00029355,'ether'),'gwei')/21000}')
+# print(f'低级消费gas {Web3.from_wei(Web3.to_wei(0.00016897,'ether'),'gwei')} gwei,平均每单位gas价格为:{Web3.from_wei(Web3.to_wei(0.00016897,'ether'),'gwei')/21000}')
+# print(f'中级消费gas {Web3.from_wei(Web3.to_wei(0.00023126,'ether'),'gwei')} gwei,平均每单位gas价格为:{Web3.from_wei(Web3.to_wei(0.00023126,'ether'),'gwei')/21000}')
+# print(f'高级消费gas {Web3.from_wei(Web3.to_wei(0.00029355,'ether'),'gwei')} gwei,平均每单位gas价格为:{Web3.from_wei(Web3.to_wei(0.00029355,'ether'),'gwei')/21000}')
 
