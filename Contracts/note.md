@@ -256,9 +256,45 @@ ABI是一份json文件，描述了部署的合约以及这个合约的函数，�
 ```
 这里是sodility到abi的映射说明：https://docs.soliditylang.org/en/v0.7.0/abi-spec.html  
 ## 如何从一次交互获取到合约abi
-说来话长，上次有一个checkin方法我没找到abi。  
-这一次我从js中找到他的abi  
-其次我通过bnbscan 确定了他是一个代理合约 随后通过代码确定了后端的代码，并反编译也找到了checkin方法的实现  白天补一下笔记
+说来话长，上次有一个`checkin`方法我没找到abi。  
+![img.png](img.png)  
+要解决这个问题，有两个解决方法。第一个方法是通过js来找abi的相关内容，可以在加载的js中，搜索这个函数名称。  
+那么直接找到加载的js，搜索这个`checkin`方法.
+![img_1.png](img_1.png)  
+第二个方法，去合约浏览器搜索交易的目的地址，那就是合约地址。点击`Contract`,往下划可以找到`abi.json`
+![img_2.png](img_2.png)
+![img_3.png](img_3.png)  
+但是在这个json中，我们没有找到对应的方法，这就比较好玩了。
+>可能由几个原因造成：  
+合约已更新，ABI未同步：如果合约代码在BNBScan上显示的是早期版本，而该合约后来进行了更新（例如添加了新的方法），但更新的ABI没有被上传到BNBScan，那么就会出现你所描述的情况。在这种情况下，合约实际上包含了“checkin”方法，但BNBScan上显示的ABI不是最新的。  
+代理合约：如果该合约是一个代理合约，它可能会委托调用到另一个合约，这个被委托的合约包含了“checkin”方法。在这种情况下，即使在代理合约的ABI中看不到“checkin”方法，它仍然可以通过代理合约调用。  
+前端直接与合约交互：在一些情况下，前端应用可能直接构建并发送特定的合约调用，而不依赖于公开的ABI。这种方法通常用于高级功能或特定情况下的调用。  
+BNBScan的数据延迟或错误：有时候，区块链浏览器可能会出现数据同步延迟或错误，导致显示的信息不是最新或不完整。
+
+所以这里我们可以考虑第二个方向，代理合约。判断一个智能合约是否是代理合约,可以访问合约的源代码，查找是否存在典型的代理合约模式，例如使用`delegatecall`的逻辑.我们找他是否实现`_IMPLEMENTATION_SLOT`.  
+这样就可以找到存储库的地址，随后通过代码转换为代理后的合约地址就ok了。
+![img_4.png](img_4.png)
+```python
+from web3 import Web3
+# 连接到以太坊节点
+w3 = Web3(Web3.HTTPProvider('https://rpc.ankr.com/bsc'))
+# 代理合约地址
+proxy_contract_address = Web3.to_checksum_address('0xB342e7D33b806544609370271A8D074313B7bc30')
+# EIP-1967定义的实现合约地址的存储槽
+implementation_slot = "0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc"
+# 读取存储槽的值，即实现合约的地址
+implementation_address = w3.eth.get_storage_at(proxy_contract_address, implementation_slot).hex()
+# 确保地址是完整的40个字符长度
+full_implementation_address = implementation_address[-40:]
+# 转换为校验和地址
+checksum_implementation_address = Web3.to_checksum_address('0x' + full_implementation_address)
+print("实现合约地址:", checksum_implementation_address)
+
+实现合约地址: 0xfA73332a85bA27eC445c65291E01aF15f726EA08
+```
+随后去浏览器找到这个实现合约的地址，反编译代码  
+![img_5.png](img_5.png)  
+![img_6.png](img_6.png)
 
 
 
