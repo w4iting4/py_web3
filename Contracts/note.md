@@ -255,8 +255,29 @@ ABI是一份json文件，描述了部署的合约以及这个合约的函数，�
 ]
 ```
 这里是sodility到abi的映射说明：https://docs.soliditylang.org/en/v0.7.0/abi-spec.html  
+### abi的组成
+函数（Functions）： 描述了合约中可供外部调用的函数的接口，包括函数的名称、参数类型和顺序、返回值类型、函数的状态可变性（例如 view、pure、payable 等）等信息。  
+事件（Events）： 描述了合约中发生的特定状态变化或重要操作的日志记录，包括事件的名称、参数类型和顺序、是否为匿名事件等信息。  
+构造函数（Constructor）： 描述了合约的构造函数，即合约实例化时执行的初始代码，包括构造函数的参数类型和顺序等信息。  
+回退函数（Fallback）： 描述了合约在接收以太币但没有匹配到任何函数调用时的默认行为，通常用于处理未知的函数调用或接收以太币的情况。  
+对于上面erc20的abi，下方是大概的解释：
+>每个条目的 type 属性：
+函数的条目类型为 "function"，事件的条目类型为 "event"。 根据这个属性，您可以确定每个条目是描述一个函数还是一个事件。  
+函数条目的属性：  
+函数条目包括 "constant"、"inputs"、"name"、"outputs"、"payable" 和 "stateMutability" 这些属性。  
+>- name 属性指定了函数的名称  
+>- inputs 属性描述了函数的输入参数  
+>- outputs 属性描述了函数的输出参数  
+>- stateMutability 属性描述了函数的状态可变性（例如，"view" 表示只读函数，"nonpayable" 表示不接受以太币的支付等）
+
+>事件条目的属性：  
+事件条目包括 "anonymous"、"inputs" 和 "name" 这些属性。  
+>- name 属性指定了事件的名称
+>- inputs 属性描述了事件的参数
+>- anonymous 属性指示了事件是否为匿名事件。  
+
 ## 如何从一次交互获取到合约abi
-说来话长，上次有一个`checkin`方法我没找到abi。  
+说来话长，上次有一个`checkin`方法我没找到abi。
 ![img.png](img.png)  
 要解决这个问题，有两个解决方法。第一个方法是通过js来找abi的相关内容，可以在加载的js中，搜索这个函数名称。  
 那么直接找到加载的js，搜索这个`checkin`方法.
@@ -295,9 +316,9 @@ print("实现合约地址:", checksum_implementation_address)
 随后去浏览器找到这个实现合约的地址，反编译代码  
 ![img_5.png](img_5.png)  
 ![img_6.png](img_6.png)
-
-
-
+## py与abi交互
+通过区块链浏览器或者js找到了相关的abi之后，我们可以通过abi来确定需要交互的参数，但是啊，我们无法确定交互参数的具体内容，就需要js调试来找到最后的参数了。  
+这里就各凭本事了。  
 
 
 
